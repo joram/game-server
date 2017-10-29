@@ -1,0 +1,16 @@
+#!/bin/bash
+#? Run the app
+
+set -e
+GS_LOCAL_RUN=1
+
+if [ "${GS_LOCAL_RUN:-0}" -eq "1" ]; then
+  go install ./cmd/game-server
+  game-server "$@"
+else
+  swu docker build game-server
+  docker run --rm \
+    --env-file=scripts/.env \
+    -p "$GS_GRPC_PORT:$GS_GRPC_PORT" \
+    game-server "$@"
+fi

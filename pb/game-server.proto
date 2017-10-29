@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package pb;
+
+service GameServer {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
+    rpc Login (LoginRequest) returns (LoginResponse) {}
+    rpc RegisterToChannel (RegisterToChannelRequest) returns (stream RegisterToChannelResponse) {}
+    rpc SendToChannel (SendToChannelRequest) returns (SendToChannelResponse) {}
+}
+
+message CreateUserRequest {
+    string username = 1;
+    string password = 2;
+}
+message CreateUserResponse {}
+
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+message LoginResponse {}
+
+message RegisterToChannelRequest {
+    string channelName = 1;
+}
+message RegisterToChannelResponse {
+}
+
+message SendToChannelRequest {
+    string channelName = 1;
+    string username = 2;
+    string message = 3;
+}
+message SendToChannelResponse {
+}
