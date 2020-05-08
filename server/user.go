@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"errors"
 	"github.com/joram/game-server/pb"
@@ -12,5 +13,6 @@ func (s *GameServer) CreateUser(ctx context.Context, request *pb.CreateUserReque
 }
 
 func (s *GameServer) Login(ctx context.Context, request *pb.LoginRequest) (*pb.LoginResponse, error) {
-	return nil, errors.New("unimplemented")
+	fmt.Printf("'%v' logged in\n", request.Username)
+	return &pb.LoginResponse{}, nil
 }

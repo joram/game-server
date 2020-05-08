@@ -7,6 +7,7 @@ service GameServer {
     rpc Login (LoginRequest) returns (LoginResponse) {}
     rpc RegisterToChannel (RegisterToChannelRequest) returns (stream RegisterToChannelResponse) {}
     rpc SendToChannel (SendToChannelRequest) returns (SendToChannelResponse) {}
+    rpc GetTiles(GetTilesRequest) returns (GetTilesResponse) {}
 }
 
 message CreateUserRequest {
@@ -33,4 +34,24 @@ message SendToChannelRequest {
     string message = 3;
 }
 message SendToChannelResponse {
+}
+
+message GetTilesRequest {
+    int64 x = 1;
+    int64 y = 2;
+}
+
+message RGBA {
+    int64 R = 1;
+    int64 G = 2;
+    int64 B = 3;
+    int64 A = 4;
+}
+
+message RGBARow {
+    map<int64,RGBA> row = 1;
+}
+
+message GetTilesResponse {
+    map<int64, RGBARow> tiles = 1;
 }

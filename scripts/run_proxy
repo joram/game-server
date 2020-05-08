@@ -1,0 +1,3 @@
+./grpcwebproxy \
+    --backend_addr=localhost:2303 \
+    --run_tls_server=false
