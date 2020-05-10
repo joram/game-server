@@ -23,7 +23,9 @@ type Pixel struct {
 	B int `json:"b"`
 }
 
-func pixels(w http.ResponseWriter, r *http.Request){
+func servePixels(w http.ResponseWriter, r *http.Request){
+	enableCors(&w)
+
 	x1 := getParam(r, "x1")
 	y1 := getParam(r, "y1")
 	x2 := getParam(r, "x2")
@@ -41,14 +43,13 @@ func pixels(w http.ResponseWriter, r *http.Request){
 			})
 		}
 	}
-	enableCors(&w)
 	json.NewEncoder(w).Encode(pixels)
 }
 
 
-func homePage(w http.ResponseWriter, r *http.Request){
+func serveHomepage(w http.ResponseWriter, r *http.Request){
 	fmt.Fprintf(w, "Welcome to the HomePage!")
-	fmt.Println("Endpoint Hit: homePage")
+	fmt.Println("Endpoint Hit: serveHomepage")
 }
 
 func createPerlin(seed int64) *perlin.Perlin {

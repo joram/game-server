@@ -1,0 +1,7 @@
+[
+  {
+    "name": "rock",
+    "image": "http://localhost:2303/static/images/rock.png",
+    "solid": true
+  }
+]
