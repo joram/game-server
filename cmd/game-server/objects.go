@@ -11,13 +11,13 @@ type Object struct {
 	Y int `json:"y"`
 	Type string `json:"type"`
 	Image string `json:"image"`
-	Solid string `json:"solid"`
+	Solid bool `json:"solid"`
 }
 
 type ObjectType struct {
 	Name string `json:"name"`
 	Image string `json:"image"`
-	Solid string `json:"solid"`
+	Solid bool `json:"solid"`
 }
 
 func LoadObjectTypes() []ObjectType {

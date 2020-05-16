@@ -23,14 +23,7 @@ type Pixel struct {
 	B int `json:"b"`
 }
 
-func servePixels(w http.ResponseWriter, r *http.Request){
-	enableCors(&w)
-
-	x1 := getParam(r, "x1")
-	y1 := getParam(r, "y1")
-	x2 := getParam(r, "x2")
-	y2 := getParam(r, "y2")
-	fmt.Printf("(%d, %d), (%d, %d)\n", x1, y1, x2, y2)
+func GetPixels(x1, y1, x2, y2 int) []Pixel {
 	pixels := []Pixel{}
 	for x := x1; x < x2; x++ {
 		for y := y1; y < y2; y++ {
@@ -43,7 +36,18 @@ func servePixels(w http.ResponseWriter, r *http.Request){
 			})
 		}
 	}
-	json.NewEncoder(w).Encode(pixels)
+	return pixels
+}
+
+func servePixels(w http.ResponseWriter, r *http.Request){
+	enableCors(&w)
+
+	x1 := getParam(r, "x1")
+	y1 := getParam(r, "y1")
+	x2 := getParam(r, "x2")
+	y2 := getParam(r, "y2")
+	fmt.Printf("(%d, %d), (%d, %d)\n", x1, y1, x2, y2)
+	json.NewEncoder(w).Encode(GetPixels(x1,y1,x2,y2))
 }
 
 

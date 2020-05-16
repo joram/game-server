@@ -15,16 +15,22 @@ type Chunk struct {
 	Y int `json:"y"`
 	Size int `json:"size"`
 	Objects []Object `json:"objects"`
+	Pixels []Pixel `json:"pixels"`
 }
 
 func coordToChunkCoord(x, y int) (int, int) {
-	x = int(math.Floor(float64(x/CHUNK_SIZE)))
-	y = int(math.Floor(float64(y/CHUNK_SIZE)))
+	x = int(math.Floor(float64(x)/float64(CHUNK_SIZE)))*CHUNK_SIZE
+	y = int(math.Floor(float64(y)/float64(CHUNK_SIZE)))*CHUNK_SIZE
 	return x, y
 }
 
 func coordToChunkKey(x, y int) string {
 	return fmt.Sprintf("%d_%d", x, y)
+}
+
+func randomAt(x,y, seed, chance int) bool {
+	n := (x*y+y)*seed
+	return n % chance == 0
 }
 
 func loadChunks() map[string]Chunk {
@@ -33,6 +39,8 @@ func loadChunks() map[string]Chunk {
 
 	for _, o := range objects {
 		x, y := coordToChunkCoord(o.X, o.Y)
+		x2 := x+CHUNK_SIZE
+		y2 := y+CHUNK_SIZE
 		chunkKey := coordToChunkKey(x, y)
 		chunk, ok := chunks[chunkKey]
 
@@ -46,6 +54,7 @@ func loadChunks() map[string]Chunk {
 				Y:       y,
 				Size:    CHUNK_SIZE,
 				Objects: []Object{o},
+				Pixels: GetPixels(x,y,x2,y2),
 			}
 			continue
 		}
@@ -69,7 +78,14 @@ func serveChunks(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		json.NewEncoder(w).Encode(chunk)
 	} else {
-		json.NewEncoder(w).Encode(Chunk{X:x, Y:y, Size: CHUNK_SIZE, Objects: []Object{}})
+		chunk = Chunk{
+			X:x,
+			Y:y,
+			Size: CHUNK_SIZE,
+			Objects: []Object{},
+			Pixels: GetPixels(x,y,x+CHUNK_SIZE,y+CHUNK_SIZE),
+		}
+		json.NewEncoder(w).Encode(chunk)
 	}
 
 }
