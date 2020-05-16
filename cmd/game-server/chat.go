@@ -9,11 +9,6 @@ import (
 )
 
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
 
 type ChatClient struct {
 	c *websocket.Conn
@@ -28,11 +23,11 @@ func (cw *ChatClient) readMessage() (map[string]string, error) {
 	var result map[string]string
 	json.Unmarshal([]byte(message), &result)
 	fmt.Println(result)
-	broadcast(result["message"], result["id"])
+	broadcastChatMessage(result["message"], result["id"])
 	return result, nil
 }
 
-func broadcast(msg, from string){
+func broadcastChatMessage(msg, from string){
 	for _, client := range clients {
 		client.writeMessage(msg, from)
 	}

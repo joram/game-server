@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"strconv"
+	"github.com/gorilla/websocket"
 )
 
 func getParam(r *http.Request, key string) int {
@@ -16,6 +17,12 @@ func getParam(r *http.Request, key string) int {
 	val := vals[0]
 	i1, _ := strconv.Atoi(val)
 	return i1
+}
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 func enableCors(w *http.ResponseWriter) {

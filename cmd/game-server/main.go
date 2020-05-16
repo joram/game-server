@@ -13,6 +13,7 @@ func handleRequests() {
 	http.HandleFunc("/pixels", servePixels)
 	http.HandleFunc("/chunks", serveChunks)
 	http.HandleFunc("/chat", chat)
+	http.HandleFunc("/objects", objects)
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/",  fs)
 	log.Fatal(http.ListenAndServe(":2303", nil))
