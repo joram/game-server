@@ -14,7 +14,7 @@ type Chunk struct {
 	X int `json:"x"`
 	Y int `json:"y"`
 	Size int `json:"size"`
-	Objects []Object `json:"objects"`
+	//Objects []Object `json:"objects"`
 	Pixels []Pixel `json:"pixels"`
 }
 
@@ -53,14 +53,14 @@ func loadChunks() map[string]Chunk {
 				X:       x,
 				Y:       y,
 				Size:    CHUNK_SIZE,
-				Objects: []Object{o},
+				//Objects: []Object{o},
 				Pixels: GetPixels(x,y,x2,y2),
 			}
 			continue
 		}
 
 		// existing chunk
-		chunk.Objects = append(chunks[chunkKey].Objects, o)
+		//chunk.Objects = append(chunks[chunkKey].Objects, o)
 		chunks[chunkKey] = chunk
 	}
 
@@ -82,7 +82,6 @@ func serveChunks(w http.ResponseWriter, r *http.Request) {
 			X:x,
 			Y:y,
 			Size: CHUNK_SIZE,
-			Objects: []Object{},
 			Pixels: GetPixels(x,y,x+CHUNK_SIZE,y+CHUNK_SIZE),
 		}
 		json.NewEncoder(w).Encode(chunk)

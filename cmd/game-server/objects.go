@@ -98,13 +98,11 @@ func (cw *ObjectClient) readMessage() (map[string]string, error) {
 	}
 	var result map[string]string
 	json.Unmarshal([]byte(message), &result)
-	fmt.Println(result)
 	return result, nil
 }
 
 func (cw *ObjectClient) writeMessage(object Object) {
 	jsonString, err := json.Marshal(object)
-	fmt.Println(jsonString)
 	if err != nil {
 		log.Println("write:", err)
 	}
