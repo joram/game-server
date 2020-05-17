@@ -22,7 +22,6 @@ func (cw *ChatClient) readMessage() (map[string]string, error) {
 	}
 	var result map[string]string
 	json.Unmarshal([]byte(message), &result)
-	fmt.Println(result)
 	broadcastChatMessage(result["message"], result["id"])
 	return result, nil
 }
