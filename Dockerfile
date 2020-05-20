@@ -14,6 +14,6 @@ EXPOSE 2303
 WORKDIR /
 ENTRYPOINT ["/bin/game-server"]
 RUN mkdir /static
-ADD ./static/* /static/
-RUN ls -hal /static
+COPY ./static/ /static/
+RUN ls -hal /static/
 COPY --from=builder /go/src/github.com/joram/game-server/build/ /bin/

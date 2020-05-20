@@ -1,11 +1,15 @@
 [
   {
     "name": "rock",
-    "image": "http://localhost:2303/images/rock.png",
+    "image": "/static/images/rock.png",
     "solid": true
   },{
     "name": "goblin",
-    "image": "http://localhost:2303/images/goblin_idle.gif",
+    "image": "/static/images/goblin_idle.gif",
+    "solid": true
+  },{
+    "name": "kobold",
+    "image": "/static/images/dc-mon/kobold.png",
     "solid": true
   }
 ]

@@ -1,0 +1,8 @@
+#cd ../game-client
+#./scripts/build
+#cd ../game-server
+#docker build -t joram87/game:latest .
+#docker push joram87/game:latest
+
+
+ssh john@stilton 'cd /volume1/Personal/john/projects/serenity; sudo docker-compose pull s_game; sudo docker-compose rm -f s_game; sudo docker-compose up -d s_game'
