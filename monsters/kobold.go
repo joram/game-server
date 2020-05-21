@@ -5,6 +5,7 @@ import (
 	"github.com/joram/game-server/utils"
 	"math"
 	"time"
+	"github.com/davecgh/go-spew/spew"
 )
 
 
@@ -12,11 +13,11 @@ type Kobold struct {
 	*BaseMonster
 }
 
-func NewKobold(id, x,y int) Kobold {
+func NewKobold(x, y int) Kobold {
 	k := Kobold{
 		&BaseMonster{
 			Object: &utils.Object{
-				ID:    id,
+				ID:    utils.NextID(),
 				X:     x,
 				Y:     y,
 				Type:  "kobold",
@@ -28,6 +29,7 @@ func NewKobold(id, x,y int) Kobold {
 			MaxDamage: 3,
 		},
 	}
+	spew.Dump(k)
 	go k.move()
 	return k
 }
@@ -79,7 +81,8 @@ func (k *Kobold) moveToNearestPlayer(maxDistance float64) bool {
 		}
 
 		if k.isSolid(x,y) {
-			k.UpdateDeltaLocation(0, 0)
+			fmt.Println("kobold not moving")
+			//k.UpdateDeltaLocation(0,0)
 			return false
 		}
 
@@ -87,6 +90,7 @@ func (k *Kobold) moveToNearestPlayer(maxDistance float64) bool {
 		return true
 	}
 
-	k.UpdateDeltaLocation(0, 0)
+	fmt.Println("kobold not moving")
+	//k.UpdateDeltaLocation(0,0)
 	return false
 }

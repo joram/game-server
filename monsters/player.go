@@ -12,11 +12,11 @@ type Player struct {
 var PLAYERS []*Player
 
 
-func NewPlayer(id, x,y int) Player {
+func NewPlayer(x, y int) Player {
 	p := Player{
 		&BaseMonster{
 			Object: &utils.Object{
-				ID:    id,
+				ID:    utils.NextID(),
 				X:     x,
 				Y:     y,
 				Type:  "player",

@@ -1,16 +1,16 @@
-FROM golang:1.9 as builder
+FROM golang:1.10 as builder
 
 ENV CGO_ENABLED=0 GOOS=linux
 RUN go get github.com/aquilax/go-perlin
 RUN go get github.com/gorilla/websocket
 
 WORKDIR /go/src/github.com/joram/game-server/
-COPY . /go/src/github.com/joram/game-server
+ADD . /go/src/github.com/joram/game-server
 RUN go build -a -installsuffix cgo -o build/game-server github.com/joram/game-server/cmd/game-server
 
 FROM alpine:latest
 RUN apk add --no-cache ca-certificates
-EXPOSE 2303
+EXPOSE 2305
 WORKDIR /
 ENTRYPOINT ["/bin/game-server"]
 RUN mkdir /static

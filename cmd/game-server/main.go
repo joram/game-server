@@ -20,10 +20,10 @@ func handleRequests() {
 	http.Handle("/static", http.StripPrefix("/static/", fs))
 	http.Handle("/",  fs)
 
-	log.Fatal(http.ListenAndServe(":2303", nil))
+	log.Fatal(http.ListenAndServe(":2305", nil))
 }
 
 func main() {
-	fmt.Println("starting server on port :2303")
+	fmt.Println("starting server on port :2305")
 	handleRequests()
 }

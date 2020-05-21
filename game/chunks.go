@@ -11,6 +11,7 @@ import (
 
 var CHUNK_SIZE = 10
 var CHUNKS = loadChunks()
+var MONSTERS = monsters.LoadMonsters()
 
 type Chunk struct {
 	X int `json:"x"`
@@ -37,16 +38,15 @@ func randomAt(x,y, seed, chance int) bool {
 
 func loadChunks() map[string]Chunk {
 	chunks := map[string]Chunk{}
-	objects := monsters.LoadMonsters()
 
-	for _, o := range objects {
+	for _, o := range MONSTERS {
 		x, y := coordToChunkCoord(o.GetLocation())
 		x2 := x + CHUNK_SIZE
 		y2 := y + CHUNK_SIZE
 		chunkKey := coordToChunkKey(x, y)
 		chunk, ok := chunks[chunkKey]
 
-		o.UpdateLocation(x%CHUNK_SIZE, y%CHUNK_SIZE)
+		//o.UpdateLocation(x%CHUNK_SIZE, y%CHUNK_SIZE)
 
 		// new chunk
 		if !ok {

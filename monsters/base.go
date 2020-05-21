@@ -13,7 +13,7 @@ type BaseMonster struct {
 
 func LoadMonsters() []utils.ObjectInterface {
 	var objects []utils.ObjectInterface
-	k := NewKobold(0,-5,-5)
+	k := NewKobold(-5,-5)
 	objects = append(objects, &k)
 	return objects
 }
