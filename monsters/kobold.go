@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/joram/game-server/utils"
 	"math"
+	"math/rand"
 	"time"
-	"github.com/davecgh/go-spew/spew"
 )
 
 
@@ -24,12 +24,13 @@ func NewKobold(x, y int) Kobold {
 				Solid: true,
 				Images: []string{"/images/dc-mon/kobold.png"},
 			},
-			Health: 20,
-			MinDamage: 1,
-			MaxDamage: 3,
+			MaxHealth: 20,
+			Health:      20,
+			MinDamage:   1,
+			MaxDamage:   3,
+			IsAttacking: false,
 		},
 	}
-	spew.Dump(k)
 	go k.move()
 	return k
 }
@@ -38,6 +39,10 @@ func (k *Kobold) nearestPlayer() (*Player, float64) {
 	var nearest *Player
 	nearestDistance := -1.0
 	for _, p := range PLAYERS {
+		if p.IsDead() {
+			continue
+		}
+
 		x1,y1 := k.GetLocation()
 		x2,y2 := p.GetLocation()
 		a := math.Abs(float64(x1-x2))
@@ -59,17 +64,46 @@ func (k *Kobold) isSolid(x,y int) bool {
 func (k *Kobold) move() {
 	for {
 		time.Sleep(time.Second)
-		k.moveToNearestPlayer(6)
+		player := k.moveToNearestPlayer(6)
+
+		// started attacking
+		if !k.IsAttacking && player != nil {
+			fmt.Println("kobold now attacking!")
+			k.IsAttacking = true
+			k.Images = []string{
+				"/images/dc-mon/kobold.png",
+				"/images/dc-misc/animated_weapon.png",
+			}
+			k.UpdateDeltaLocation(0, 0)
+
+		// stopped attacking
+		} else if k.IsAttacking && player == nil {
+			fmt.Printf("kobold[%d] stopped attacking\n", k.ID)
+			k.IsAttacking = false
+			k.Images = []string{
+				"/images/dc-mon/kobold.png",
+			}
+			k.UpdateDeltaLocation(0,0)
+		}
+
+		if k.IsAttacking {
+			damage := rand.Intn(k.MaxDamage - k.MinDamage) + k.MinDamage
+			player.TakeDamage(damage, k)
+		}
+
 	}
 }
-func (k *Kobold) moveToNearestPlayer(maxDistance float64) bool {
+
+func (k *Kobold) moveToNearestPlayer(maxDistance float64) *Player {
 	player, distance := k.nearestPlayer()
 
 	x := k.X
 	y := k.Y
-	if player != nil && math.Round(distance) != 1 && distance <= maxDistance {
-		fmt.Printf("nearest player is %v at %v\n", player.ID, distance)
+	if math.Round(distance) == 1 {
+		return player
+	}
 
+	if player != nil && distance <= maxDistance {
 		if player.X < k.X {
 			x -= 1
 		} else if player.X > k.X {
@@ -81,16 +115,10 @@ func (k *Kobold) moveToNearestPlayer(maxDistance float64) bool {
 		}
 
 		if k.isSolid(x,y) {
-			fmt.Println("kobold not moving")
-			//k.UpdateDeltaLocation(0,0)
-			return false
+			return nil
 		}
 
 		k.UpdateLocation(x,y)
-		return true
 	}
-
-	fmt.Println("kobold not moving")
-	//k.UpdateDeltaLocation(0,0)
-	return false
+	return nil
 }

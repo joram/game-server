@@ -3,89 +3,67 @@ package game
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/joram/game-server/monsters"
 	"github.com/joram/game-server/utils"
-	"math"
 	"net/http"
 )
 
-var CHUNK_SIZE = 10
-var CHUNKS = loadChunks()
-var MONSTERS = monsters.LoadMonsters()
+var ChunkSize = 10
+var ActiveChunks = map[string]Chunk{}
+
+func allMonsters() []utils.BaseMonsterInterface {
+	var all []utils.BaseMonsterInterface
+	for _, c := range ActiveChunks {
+		all = append(all, c.Monsters...)
+	}
+	return all
+}
 
 type Chunk struct {
 	X int `json:"x"`
 	Y int `json:"y"`
 	Size int `json:"size"`
-	//ServeObjects []Object `json:"objects"`
 	Pixels []utils.Pixel `json:"pixels"`
+	Monsters []utils.BaseMonsterInterface
 }
 
-func coordToChunkCoord(x, y int) (int, int) {
-	x = int(math.Floor(float64(x)/float64(CHUNK_SIZE)))* CHUNK_SIZE
-	y = int(math.Floor(float64(y)/float64(CHUNK_SIZE)))* CHUNK_SIZE
-	return x, y
+func (c *Chunk) IsSolid(x,y int) bool {
+	for _, p := range c.Pixels {
+		if p.X == x && p.Y == y {
+			return p.G > 180
+		}
+	}
+	return false
 }
 
 func coordToChunkKey(x, y int) string {
 	return fmt.Sprintf("%d_%d", x, y)
 }
 
-func randomAt(x,y, seed, chance int) bool {
-	n := (x*y+y)*seed
-	return n % chance == 0
-}
+func getChunk(x,y int) *Chunk {
+	x2 := x + ChunkSize
+	y2 := y + ChunkSize
+	chunkKey := coordToChunkKey(x, y)
+	chunk, ok := ActiveChunks[chunkKey]
 
-func loadChunks() map[string]Chunk {
-	chunks := map[string]Chunk{}
-
-	for _, o := range MONSTERS {
-		x, y := coordToChunkCoord(o.GetLocation())
-		x2 := x + CHUNK_SIZE
-		y2 := y + CHUNK_SIZE
-		chunkKey := coordToChunkKey(x, y)
-		chunk, ok := chunks[chunkKey]
-
-		//o.UpdateLocation(x%CHUNK_SIZE, y%CHUNK_SIZE)
-
-		// new chunk
-		if !ok {
-			chunks[chunkKey] = Chunk{
-				X:    x,
-				Y:    y,
-				Size: CHUNK_SIZE,
-				//ServeObjects: []Object{o},
-				Pixels: utils.GetPixels(x,y,x2,y2),
-			}
-			continue
+	if !ok {
+		chunk = Chunk{
+			X:    x,
+			Y:    y,
+			Size: ChunkSize,
+			//ServeObjects: []Object{o},
+			Pixels: utils.GetPixels(x,y,x2,y2),
 		}
-
-		// existing chunk
-		//chunk.ServeObjects = append(chunks[chunkKey].ServeObjects, o)
-		chunks[chunkKey] = chunk
+		chunk.Monsters = NewMonsters(x, y, x+ChunkSize, y+ChunkSize, 1, chunk)
+		ActiveChunks[chunkKey] = chunk
 	}
 
-	return chunks
+	return &chunk
 }
 
 func ServeChunks(w http.ResponseWriter, r *http.Request) {
 	utils.EnableCors(&w)
 	x := utils.GetParam(r, "x")
 	y := utils.GetParam(r, "y")
-	fmt.Printf("chunk: (%d, %d)\n", x, y)
-
-	chunkKey := coordToChunkKey(x,y)
-	chunk, ok := CHUNKS[chunkKey]
-	if ok {
-		json.NewEncoder(w).Encode(chunk)
-	} else {
-		chunk = Chunk{
-			X:      x,
-			Y:      y,
-			Size:   CHUNK_SIZE,
-			Pixels: utils.GetPixels(x,y,x+CHUNK_SIZE,y+CHUNK_SIZE),
-		}
-		json.NewEncoder(w).Encode(chunk)
-	}
-
+	chunk := getChunk(x,y)
+	json.NewEncoder(w).Encode(chunk)
 }

@@ -3,16 +3,21 @@ import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
+	"sync"
 )
 
 type ObjectClient struct {
-	C         *websocket.Conn
-	Character ObjectInterface
+	C      *websocket.Conn
+	Player BaseMonsterInterface
+	Mux    *sync.Mutex
 }
 
 var ObjectClients = []ObjectClient{}
 
 func (cw *ObjectClient) ReadMessage() (map[string]interface{}, error) {
+	//cw.Mux.Lock()
+	//defer cw.Mux.Unlock()
+
 	_, message, err := cw.C.ReadMessage()
 	if err != nil {
 		return nil, err
@@ -23,6 +28,9 @@ func (cw *ObjectClient) ReadMessage() (map[string]interface{}, error) {
 }
 
 func (cw *ObjectClient) RemoveObject(object ObjectInterface) {
+	cw.Mux.Lock()
+	defer cw.Mux.Unlock()
+
 	type removeMessage struct {
 		Action string `json:"action"`
 		ObjectID int `json:"id"`
@@ -37,10 +45,10 @@ func (cw *ObjectClient) RemoveObject(object ObjectInterface) {
 }
 
 func (cw *ObjectClient) UpdateObject(object ObjectInterface) {
-	jsonString, err := json.Marshal(object)
-	if err != nil {
-		log.Println("write:", err)
-	}
+	cw.Mux.Lock()
+	defer cw.Mux.Unlock()
+
+	jsonString := object.AsString()
 	cw.C.WriteMessage(1, []byte(jsonString))
 }
 

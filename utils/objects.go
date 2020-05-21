@@ -2,7 +2,8 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
+
 	//"github.com/joram/game-server/game"
 	"io/ioutil"
 )
@@ -16,11 +17,20 @@ type Object struct {
 	Solid bool `json:"solid"`
 }
 
+func (o *Object) AsString() string {
+	jsonString, err := json.Marshal(o)
+	if err != nil {
+		log.Println("write:", err)
+	}
+	return string(jsonString)
+}
+
 type ObjectInterface interface {
 	UpdateLocation(x,y int)
 	UpdateDeltaLocation(x,y int)
 	GetLocation() (x,y int)
 	GetID() int
+	AsString() string
 }
 
 type ObjectType struct {
@@ -39,14 +49,14 @@ func LoadObjectTypes() []ObjectType {
 func (o *Object) UpdateLocation(x,y int){
 	o.X = x
 	o.Y = y
-	fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
+	//fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
 	BroadcastLocationChange(o, ObjectClients)
 }
 
 func (o *Object) UpdateDeltaLocation(x,y int){
 	o.X += x
 	o.Y += y
-	fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
+	//fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
 	BroadcastLocationChange(o, ObjectClients)
 }
 
@@ -57,4 +67,16 @@ func (o *Object) GetLocation() (x,y int) {
 
 func (o *Object) GetID() int {
 	return o.ID
+}
+
+func (o *Object) Broadcast(){
+	for _, client := range ObjectClients {
+		client.UpdateObject(o)
+	}
+}
+
+func (o *Object) BroadcastRemove(){
+	for _, client := range ObjectClients {
+		client.RemoveObject(o)
+	}
 }

@@ -29,6 +29,7 @@ func NewPlayer(x, y int) Player {
 					"/images/player/head/hood_ybrown.png",
 				},
 			},
+			MaxHealth: 20,
 			Health: 20,
 			MinDamage: 1,
 			MaxDamage: 3,
@@ -50,6 +51,9 @@ func (p Player) GetID() int {
 	return p.BaseMonster.Object.GetID()
 }
 
+func (p Player) AsString() string {
+	return p.BaseMonster.AsString()
+}
 
 func (p *Player) register(){
 	PLAYERS = append(PLAYERS, p)
@@ -62,4 +66,5 @@ func (p *Player) Unregister(){
 		players = append(players, pp)
 	}
 	PLAYERS = players
+	p.Broadcast()
 }
