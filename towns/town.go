@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/png"
 	"io"
+	"math"
 	"os"
 )
 
@@ -17,6 +18,19 @@ type Town struct {
 	Width int
 	Height int
 }
+
+var Towns = []Town{LoadTown()}
+
+func IsTown(x,y int) bool {
+	for _, t := range Towns {
+		if t.Contains(x, y) {
+			return true
+		}
+	}
+	return false
+}
+
+
 
 func (t *Town) Contains(x,y int) bool {
 	if x < t.X { return false }
@@ -61,25 +75,30 @@ func LoadTown() Town {
 	}
 	defer file.Close()
 
-	pixels := getPixels(file)
-	t.Pixels = pixels
+	t.Pixels, t.Width, t.Height = getPixels(file)
+	t.Width += 1
+	t.Height += 1
 	return t
 }
 
 
-func getPixels(file io.Reader) []utils.Pixel {
+func getPixels(file io.Reader) ([]utils.Pixel, int, int) {
 	img, _, _ := image.Decode(file)
 
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
 
 	pixels := []utils.Pixel{}
+	maxX := 0
+	maxY := 0
 	for y := 0; y < height; y++ {
+		maxY = int(math.Max(float64(maxY), float64(y)))
 		for x := 0; x < width; x++ {
+			maxX = int(math.Max(float64(maxX), float64(x)))
 			r,g,b, _ := img.At(x, y).RGBA()
 			pixels = append(pixels, utils.Pixel{x,y,int(r),int(g),int(b)})
 		}
 	}
 
-	return pixels
+	return pixels, maxX, maxY
 }

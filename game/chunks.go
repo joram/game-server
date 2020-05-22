@@ -10,7 +10,6 @@ import (
 
 var ChunkSize = 10
 var ActiveChunks = map[string]Chunk{}
-var Towns = []towns.Town{towns.LoadTown()}
 
 func allMonsters() []utils.BaseMonsterInterface {
 	var all []utils.BaseMonsterInterface
@@ -53,7 +52,7 @@ func getChunk(x,y int) *Chunk {
 
 		// override pixels with town data
 		for i, p := range pixels {
-			for _, town := range Towns {
+			for _, town := range towns.Towns {
 				if town.Contains(p.X, p.Y) {
 					pixels[i] = town.Pixel(p.X, p.Y)
 				}

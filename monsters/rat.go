@@ -3,7 +3,6 @@ package monsters
 import (
 	"fmt"
 	"github.com/joram/game-server/utils"
-	"math"
 	"math/rand"
 	"time"
 )
@@ -33,32 +32,6 @@ func NewRat(x, y int) Rat {
 	}
 	go k.move()
 	return k
-}
-
-func (k *Rat) nearestPlayer() (*Player, float64) {
-	var nearest *Player
-	nearestDistance := -1.0
-	for _, p := range PLAYERS {
-		if p.IsDead() {
-			continue
-		}
-
-		x1,y1 := k.GetLocation()
-		x2,y2 := p.GetLocation()
-		a := math.Abs(float64(x1-x2))
-		b := math.Abs(float64(y1-y2))
-		distance := math.Sqrt(a*a + b*b)
-		if nearest == nil || distance < nearestDistance {
-				nearest = p
-				nearestDistance = distance
-		}
-	}
-	return nearest, nearestDistance
-}
-
-
-func (k *Rat) isSolid(x,y int) bool {
-	return utils.GetPixel(x,y).G > 180
 }
 
 func (k *Rat) move() {
@@ -92,33 +65,4 @@ func (k *Rat) move() {
 		}
 
 	}
-}
-
-func (k *Rat) moveToNearestPlayer(maxDistance float64) *Player {
-	player, distance := k.nearestPlayer()
-
-	x := k.X
-	y := k.Y
-	if math.Round(distance) == 1 {
-		return player
-	}
-
-	if player != nil && distance <= maxDistance {
-		if player.X < k.X {
-			x -= 1
-		} else if player.X > k.X {
-			x += 1
-		} else if player.Y < k.Y {
-			y -= 1
-		} else if player.Y > k.Y {
-			y += 1
-		}
-
-		if k.isSolid(x,y) {
-			return nil
-		}
-
-		k.UpdateLocation(x,y)
-	}
-	return nil
 }

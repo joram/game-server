@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/joram/game-server/towns"
 	"github.com/joram/game-server/utils"
 	"github.com/joram/game-server/monsters"
 	"math"
@@ -25,6 +26,10 @@ func NewMonsters(minX, minY, maxX, maxY int, count float64, chunk Chunk) []utils
 			x = rand.Intn(maxX-minX)+minX
 			y = rand.Intn(maxY-minY)+minY
 			isSolid = chunk.IsSolid(x, y)
+		}
+
+		if towns.IsTown(x,y) {
+			continue
 		}
 
 		if rand.Intn(2) == 0 {
