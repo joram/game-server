@@ -3,12 +3,21 @@ package game
 import (
 	"github.com/joram/game-server/utils"
 	"github.com/joram/game-server/monsters"
+	"math"
 	"math/rand"
 )
 
-func NewMonsters(minX, minY, maxX, maxY, count int, chunk Chunk) []utils.BaseMonsterInterface {
+func NewMonsters(minX, minY, maxX, maxY int, count float64, chunk Chunk) []utils.BaseMonsterInterface {
 	var m []utils.BaseMonsterInterface
-	for i:=0; i<count; i++ {
+
+	if count < 1 {
+		x := int(100*count)
+		if rand.Intn(100) > x {
+			return m
+		}
+	}
+
+	for i:=0; i<int(math.Ceil(count)); i++ {
 		isSolid := true
 		x := 0
 		y := 0
@@ -18,8 +27,14 @@ func NewMonsters(minX, minY, maxX, maxY, count int, chunk Chunk) []utils.BaseMon
 			isSolid = chunk.IsSolid(x, y)
 		}
 
-		k := monsters.NewKobold(x,y)
-		m = append(m, k)
+		if rand.Intn(2) == 0 {
+			k := monsters.NewKobold(x,y)
+			m = append(m, k)
+		} else {
+			k := monsters.NewRat(x,y)
+			m = append(m, k)
+		}
+
 	}
 	return m
 }
