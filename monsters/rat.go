@@ -34,35 +34,45 @@ func NewRat(x, y int) Rat {
 	return k
 }
 
-func (k *Rat) move() {
+func (r *Rat) move() {
 	for {
 		time.Sleep(time.Second)
-		player := k.moveToNearestPlayer(6)
+		player := r.moveToNearestPlayer(6)
 
 		// started attacking
-		if !k.IsAttacking && player != nil {
+		if !r.IsAttacking && player != nil {
 			fmt.Println("Rat now attacking!")
-			k.IsAttacking = true
-			k.Images = []string{
+			r.IsAttacking = true
+			r.Images = []string{
 				"/images/dc-mon/animals/rat.png",
 				"/images/dc-misc/animated_weapon.png",
 			}
-			k.UpdateDeltaLocation(0, 0)
+			r.Broadcast()
 
 		// stopped attacking
-		} else if k.IsAttacking && player == nil {
-			fmt.Printf("Rat[%d] stopped attacking\n", k.ID)
-			k.IsAttacking = false
-			k.Images = []string{
+		} else if r.IsAttacking && player == nil {
+			fmt.Printf("Rat[%d] stopped attacking\n", r.ID)
+			r.IsAttacking = false
+			r.Images = []string{
 				"/images/dc-mon/animals/rat.png",
 			}
-			k.UpdateDeltaLocation(0,0)
+			r.Broadcast()
 		}
 
-		if k.IsAttacking {
-			damage := rand.Intn(k.MaxDamage - k.MinDamage) + k.MinDamage
-			player.TakeDamage(damage, k)
+		// attack
+		if r.IsAttacking {
+			damage := rand.Intn(r.MaxDamage - r.MinDamage) + r.MinDamage
+			player.TakeDamage(damage, r)
 		}
 
+		// die
+		if r.IsDead() {
+			r.Images = []string{
+				"/images/dc-misc/blood_red.png",
+			}
+			r.Broadcast()
+			fmt.Printf("%s[%d] died!\n", r.Type, r.ID)
+			return
+		}
 	}
 }

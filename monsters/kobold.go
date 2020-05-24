@@ -37,6 +37,7 @@ func NewKobold(x, y int) Kobold {
 func (k *Kobold) move() {
 	for {
 		time.Sleep(time.Second)
+
 		player := k.moveToNearestPlayer(6)
 
 		// started attacking
@@ -59,9 +60,20 @@ func (k *Kobold) move() {
 			k.UpdateDeltaLocation(0,0)
 		}
 
+		// attack
 		if k.IsAttacking {
 			damage := rand.Intn(k.MaxDamage - k.MinDamage) + k.MinDamage
 			player.TakeDamage(damage, k)
+		}
+
+		// die
+		if k.IsDead() {
+			k.Images = []string{
+				"/images/dc-misc/blood_red.png",
+			}
+			k.Broadcast()
+			fmt.Printf("%s[%d] died!\n", k.Type, k.ID)
+			return
 		}
 
 	}

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"github.com/joram/game-server/monsters"
 	"github.com/joram/game-server/utils"
 	"log"
@@ -37,6 +38,11 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 			x := int(msg["x"].(float64))
 			y := int(msg["y"].(float64))
 			if !client.Player.IsDead() {
+				m := monsterAt(x,y)
+				if m != nil {
+					fmt.Printf("player[%d] attacks %s[%d]\n", client.Player.GetID(), m.GetType(), m.GetID())
+					m.TakeDamage(5, client.Player)
+				}
 				client.Player.UpdateLocation(x, y)
 			}
 

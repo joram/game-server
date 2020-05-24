@@ -8,5 +8,6 @@ type BaseMonsterInterface interface {
 	GetLocation() (x,y int)
 	UpdateLocation(x,y int)
 	UpdateDeltaLocation(x,y int)
+	TakeDamage(damage int, attacker BaseMonsterInterface)
 }
 

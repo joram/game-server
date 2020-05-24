@@ -64,7 +64,7 @@ func (m *BaseMonster) HealthBar() *string {
 	return &s[5]
 }
 
-func (m BaseMonster) AsString() string {
+func (m *BaseMonster) AsString() string {
 	originalImages := m.Images
 	hb := m.HealthBar()
 	if m.IsDead(){

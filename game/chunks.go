@@ -21,6 +21,16 @@ func allMonsters() []utils.BaseMonsterInterface {
 	return all
 }
 
+func monsterAt(x,y int ) utils.BaseMonsterInterface {
+	for _, m := range allMonsters() {
+		mX, mY := m.GetLocation()
+		if mX == x && mY == y {
+			return m
+		}
+	}
+	return nil
+}
+
 type Chunk struct {
 	X int `json:"x"`
 	Y int `json:"y"`
@@ -71,7 +81,7 @@ func getChunk(x,y int) *Chunk {
 			//ServeObjects: []Object{o},
 			Pixels: pixels,
 		}
-		chunk.Monsters = NewMonsters(x, y, x+ChunkSize, y+ChunkSize, 0.3, chunk)
+		chunk.Monsters = NewMonsters(x, y, x+ChunkSize, y+ChunkSize, 1.3, chunk)
 		ActiveChunks[chunkKey] = chunk
 	}
 
