@@ -6,10 +6,12 @@ import (
 	"github.com/joram/game-server/towns"
 	"github.com/joram/game-server/utils"
 	"net/http"
+	"sync"
 )
 
 var ChunkSize = 10
 var ActiveChunks = map[string]Chunk{}
+var ActiveChunkMux = sync.Mutex{}
 
 func allMonsters() []utils.BaseMonsterInterface {
 	var all []utils.BaseMonsterInterface
@@ -41,6 +43,9 @@ func coordToChunkKey(x, y int) string {
 }
 
 func getChunk(x,y int) *Chunk {
+	ActiveChunkMux.Lock()
+	defer ActiveChunkMux.Unlock()
+
 	x2 := x + ChunkSize
 	y2 := y + ChunkSize
 	chunkKey := coordToChunkKey(x, y)
@@ -66,7 +71,7 @@ func getChunk(x,y int) *Chunk {
 			//ServeObjects: []Object{o},
 			Pixels: pixels,
 		}
-		chunk.Monsters = NewMonsters(x, y, x+ChunkSize, y+ChunkSize, 0.1, chunk)
+		chunk.Monsters = NewMonsters(x, y, x+ChunkSize, y+ChunkSize, 0.3, chunk)
 		ActiveChunks[chunkKey] = chunk
 	}
 

@@ -7,6 +7,7 @@ import (
 	"github.com/joram/game-server/utils"
 	"log"
 	"net/http"
+	"sync"
 )
 
 
@@ -14,9 +15,13 @@ import (
 type ChatClient struct {
 	c *websocket.Conn
 	ID string `json:"id"`
+	Mux    *sync.Mutex
 }
 
 func (cw *ChatClient) readMessage() (map[string]string, error) {
+	cw.Mux.Lock()
+	defer cw.Mux.Unlock()
+
 	_, message, err := cw.c.ReadMessage()
 	if err != nil {
 		return nil, err
@@ -34,6 +39,9 @@ func broadcastChatMessage(msg, from string){
 }
 
 func (cw *ChatClient) writeMessage(message string, from string) {
+	cw.Mux.Lock()
+	defer cw.Mux.Unlock()
+
 	data := map[string]string{"message":message, "from": from}
 	jsonString, err := json.Marshal(data)
 	if err != nil {
@@ -51,7 +59,7 @@ func ServeChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := ChatClient{c, "id"}
+	client := ChatClient{c:c, ID:"id",Mux: &sync.Mutex{}}
 	clients = append(clients, client)
 
 	go func(client ChatClient){

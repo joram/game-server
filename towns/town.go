@@ -67,7 +67,7 @@ func LoadTown() Town {
 	// You can register another format here
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 
-	file, err := os.Open("./towns/images/town1.png")
+	file, err := os.Open("./static/towns/town1.png")
 
 	if err != nil {
 		fmt.Println("Error: File could not be opened")
@@ -80,7 +80,6 @@ func LoadTown() Town {
 	t.Height += 1
 	return t
 }
-
 
 func getPixels(file io.Reader) ([]utils.Pixel, int, int) {
 	img, _, _ := image.Decode(file)

@@ -15,9 +15,6 @@ type ObjectClient struct {
 var ObjectClients = []ObjectClient{}
 
 func (cw *ObjectClient) ReadMessage() (map[string]interface{}, error) {
-	//cw.Mux.Lock()
-	//defer cw.Mux.Unlock()
-
 	_, message, err := cw.C.ReadMessage()
 	if err != nil {
 		return nil, err
