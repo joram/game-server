@@ -10,6 +10,8 @@ type ObjectClient struct {
 	C      *websocket.Conn
 	Player BaseMonsterInterface
 	Mux    *sync.Mutex
+	GoogleId string
+	AccessToken string
 }
 
 var ObjectClients = []ObjectClient{}

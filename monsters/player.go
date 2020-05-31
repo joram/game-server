@@ -1,7 +1,12 @@
 package monsters
 
 import (
+	"fmt"
 	"github.com/joram/game-server/utils"
+	"math/rand"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 
@@ -9,10 +14,35 @@ type Player struct {
 	*BaseMonster
 }
 
+var baseImages = listImages("player/base", ".png")
+var legsImages = listImages("player/legs", ".png")
+var bootsImages = listImages("player/boots", ".png")
+var bodyImages = listImages("player/body", ".png")
+var headImages = listImages("player/head", ".png")
+
 var PLAYERS []*Player
 
+func listImages(path, ext string) []string {
+	paths := []string{}
+	root := fmt.Sprintf("static/images/%s", path)
+	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if filepath.Ext(path) == ext {
+			paths = append(paths, strings.Replace(path, "static", "",1))
+		}
+		return nil
+	})
+	return paths
+}
 
 func NewPlayer(x, y int) Player {
+	images := []string{
+		baseImages[rand.Intn(len(baseImages))],
+		legsImages[rand.Intn(len(legsImages))],
+		bootsImages[rand.Intn(len(bootsImages))],
+		bodyImages[rand.Intn(len(bodyImages))],
+		headImages[rand.Intn(len(headImages))],
+	}
+
 	p := Player{
 		&BaseMonster{
 			Object: &utils.Object{
@@ -21,13 +51,7 @@ func NewPlayer(x, y int) Player {
 				Y:     y,
 				Type:  "player",
 				Solid: true,
-				Images: []string{
-					"/images/player/base/gnome_m.png",
-					"/images/player/legs/leg_armor01.png",
-					"/images/player/boots/short_brown.png",
-					"/images/player/body/aragorn.png",
-					"/images/player/head/hood_ybrown.png",
-				},
+				Images: images,
 			},
 			MaxHealth: 20,
 			Health: 20,
@@ -52,6 +76,7 @@ func (p Player) GetID() int {
 }
 
 func (p Player) AsString() string {
+	fmt.Println("rendering player as string")
 	return p.BaseMonster.AsString()
 }
 

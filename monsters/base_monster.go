@@ -74,6 +74,7 @@ func (m *BaseMonster) AsString() string {
 		m.Images = append(m.Images, *hb)
 	}
 	jsonString, err := json.Marshal(m)
+	fmt.Println(string(jsonString))
 	m.Images = originalImages
 	if err != nil {
 		log.Println("write:", err)
@@ -83,6 +84,7 @@ func (m *BaseMonster) AsString() string {
 
 func (m *BaseMonster) TakeDamage(damage int, attacker utils.BaseMonsterInterface) {
 	m.Health -= damage
+	m.Solid = false
 	m.Broadcast()
 	fmt.Printf("%s[%d] took %d damage from %s[%d]\n", m.Type, m.ID, damage, attacker.GetType(), attacker.GetID())
 	if m.IsDead() {

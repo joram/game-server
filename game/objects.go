@@ -16,8 +16,8 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	character := monsters.NewPlayer(0,0)
-	client := utils.ObjectClient{C:c, Player:character, Mux:&sync.Mutex{}}
+	player := monsters.NewPlayer(0,0)
+	client := utils.ObjectClient{C:c, Player:player, Mux:&sync.Mutex{}}
 	utils.ObjectClients = append(utils.ObjectClients, client)
 
 	go func(client utils.ObjectClient){
@@ -35,17 +35,27 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				break
 			}
-			x := int(msg["x"].(float64))
-			y := int(msg["y"].(float64))
-			if !client.Player.IsDead() {
-				m := monsterAt(x,y)
-				if m != nil {
-					fmt.Printf("player[%d] attacks %s[%d]\n", client.Player.GetID(), m.GetType(), m.GetID())
-					m.TakeDamage(5, client.Player)
-				}
-				client.Player.UpdateLocation(x, y)
-			}
 
+			// login
+			if accessToken, ok := msg["accessToken"]; ok {
+				googleId, _ := msg["googleId"]
+				client.GoogleId = googleId.(string)
+				client.AccessToken = accessToken.(string)
+
+			// position update
+			} else {
+				x := int(msg["x"].(float64))
+				y := int(msg["y"].(float64))
+				if !client.Player.IsDead() {
+					m := monsterAt(x, y)
+					if m != nil && !m.IsDead(){
+						fmt.Printf("player[%d] attacks %s[%d]\n", client.Player.GetID(), m.GetType(), m.GetID())
+						m.TakeDamage(5, client.Player)
+					} else {
+						client.Player.UpdateLocation(x, y)
+					}
+				}
+			}
 		}
 
 		newOjectClients := []utils.ObjectClient{}
