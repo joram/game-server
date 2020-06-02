@@ -3,7 +3,6 @@ package game
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/joram/game-server/towns"
 	"github.com/joram/game-server/utils"
 	"net/http"
 	"sync"
@@ -52,6 +51,12 @@ func coordToChunkKey(x, y int) string {
 	return fmt.Sprintf("%d_%d", x, y)
 }
 
+func getChunkContainingCoord(x,y int) *Chunk {
+	x -= x%ChunkSize
+	y -= y%ChunkSize
+	return getChunk(x,y)
+}
+
 func getChunk(x,y int) *Chunk {
 	ActiveChunkMux.Lock()
 	defer ActiveChunkMux.Unlock()
@@ -67,7 +72,7 @@ func getChunk(x,y int) *Chunk {
 
 		// override pixels with town data
 		for i, p := range pixels {
-			for _, town := range towns.Towns {
+			for _, town := range utils.Towns {
 				if town.Contains(p.X, p.Y) {
 					pixels[i] = town.Pixel(p.X, p.Y)
 				}

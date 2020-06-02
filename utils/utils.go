@@ -1,9 +1,9 @@
 package utils
 
 import (
+	"github.com/gorilla/websocket"
 	"net/http"
 	"strconv"
-	"github.com/gorilla/websocket"
 )
 
 func GetParam(r *http.Request, key string) int {
@@ -18,6 +18,17 @@ func GetParam(r *http.Request, key string) int {
 	i1, _ := strconv.Atoi(val)
 	return i1
 }
+
+func IsSolid(x,y int) bool {
+	for _, town := range Towns {
+		if town.Contains(x, y) {
+			pixel := town.Pixel(x, y)
+			return pixel.G > 180
+		}
+	}
+	return GetPixel(x,y).G > 180
+}
+
 
 var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {

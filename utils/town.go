@@ -1,8 +1,7 @@
-package towns
+package utils
 
 import (
 	"fmt"
-	"github.com/joram/game-server/utils"
 	"image"
 	"image/png"
 	"io"
@@ -12,7 +11,7 @@ import (
 
 
 type Town struct {
-	Pixels []utils.Pixel
+	Pixels []Pixel
 	X      int
 	Y      int
 	Width int
@@ -40,10 +39,10 @@ func (t *Town) Contains(x,y int) bool {
 	return true
 }
 
-func (t *Town) Pixel(x,y int) utils.Pixel {
+func (t *Town) Pixel(x,y int) Pixel {
 	for _, p := range t.Pixels {
 		if p.X+t.X == x && p.Y+t.Y == y {
-			pixel := utils.Pixel{
+			pixel := Pixel{
 				X:x,
 				Y:y,
 				R:p.R,
@@ -54,7 +53,7 @@ func (t *Town) Pixel(x,y int) utils.Pixel {
 		}
 	}
 	fmt.Println("unknown pixel")
-	return utils.Pixel{}
+	return Pixel{}
 }
 
 func LoadTown() Town {
@@ -81,13 +80,13 @@ func LoadTown() Town {
 	return t
 }
 
-func getPixels(file io.Reader) ([]utils.Pixel, int, int) {
+func getPixels(file io.Reader) ([]Pixel, int, int) {
 	img, _, _ := image.Decode(file)
 
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
 
-	pixels := []utils.Pixel{}
+	pixels := []Pixel{}
 	maxX := 0
 	maxY := 0
 	for y := 0; y < height; y++ {
@@ -95,7 +94,7 @@ func getPixels(file io.Reader) ([]utils.Pixel, int, int) {
 		for x := 0; x < width; x++ {
 			maxX = int(math.Max(float64(maxX), float64(x)))
 			r,g,b, _ := img.At(x, y).RGBA()
-			pixels = append(pixels, utils.Pixel{x,y,int(r),int(g),int(b)})
+			pixels = append(pixels, Pixel{x,y,int(r),int(g),int(b)})
 		}
 	}
 

@@ -87,9 +87,9 @@ func (p *Player) register(){
 func (p *Player) Unregister(){
 	var players []*Player
 	for _, pp := range PLAYERS {
-		if pp == p { continue }
+		if pp.ID == p.ID { continue }
 		players = append(players, pp)
 	}
 	PLAYERS = players
-	p.Broadcast()
+	//p.Broadcast()
 }

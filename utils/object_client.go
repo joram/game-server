@@ -1,6 +1,7 @@
 package utils
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"sync"
@@ -41,6 +42,16 @@ func (cw *ObjectClient) RemoveObject(object ObjectInterface) {
 		log.Println("write:", err)
 	}
 	cw.C.WriteMessage(1, []byte(jsonString))
+}
+
+func (cw *ObjectClient) SendPlayerID() {
+	cw.Mux.Lock()
+	defer cw.Mux.Unlock()
+
+	jsonString := fmt.Sprintf("{\"playerId\": %d}", cw.Player.GetID())
+	fmt.Println(jsonString)
+	cw.C.WriteMessage(1, []byte(jsonString))
+
 }
 
 func (cw *ObjectClient) UpdateObject(object ObjectInterface) {

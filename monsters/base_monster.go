@@ -3,7 +3,6 @@ package monsters
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/joram/game-server/towns"
 	"math"
 
 	//"github.com/joram/game-server/game"
@@ -74,7 +73,7 @@ func (m *BaseMonster) AsString() string {
 		m.Images = append(m.Images, *hb)
 	}
 	jsonString, err := json.Marshal(m)
-	fmt.Println(string(jsonString))
+
 	m.Images = originalImages
 	if err != nil {
 		log.Println("write:", err)
@@ -152,7 +151,7 @@ func (m *BaseMonster) moveToNearestPlayer(maxDistance float64) *Player {
 			return nil
 		}
 
-		if towns.IsTown(x,y) {
+		if utils.IsTown(x,y) {
 			return nil
 		}
 
