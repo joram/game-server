@@ -64,15 +64,25 @@ func NewPlayer(x, y int) Player {
 }
 
 func (p Player) GetLocation() (x,y int){
-	return p.BaseMonster.Object.GetLocation()
+	return p.BaseMonster.GetLocation()
 }
 
 func (p Player) UpdateLocation(x,y int){
-	p.BaseMonster.Object.UpdateLocation(x,y)
+	p.X = x
+	p.Y = y
+	//fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
+	utils.BroadcastLocationChange(p, utils.ObjectClients)
+}
+
+func (p Player) UpdateDeltaLocation(x,y int){
+	p.X += x
+	p.Y += y
+	//fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
+	utils.BroadcastLocationChange(p, utils.ObjectClients)
 }
 
 func (p Player) GetID() int {
-	return p.BaseMonster.Object.GetID()
+	return p.BaseMonster.GetID()
 }
 
 func (p Player) AsString() string {

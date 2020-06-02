@@ -74,6 +74,7 @@ func (m *BaseMonster) AsString() string {
 	}
 	jsonString, err := json.Marshal(m)
 
+	fmt.Println(m.Images)
 	m.Images = originalImages
 	if err != nil {
 		log.Println("write:", err)
