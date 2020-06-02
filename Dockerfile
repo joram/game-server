@@ -3,6 +3,7 @@ FROM golang:1.10 as builder
 ENV CGO_ENABLED=0 GOOS=linux
 RUN go get github.com/aquilax/go-perlin
 RUN go get github.com/gorilla/websocket
+RUN go get github.com/mattn/go-sqlite3
 
 WORKDIR /go/src/github.com/joram/game-server/
 ADD . /go/src/github.com/joram/game-server

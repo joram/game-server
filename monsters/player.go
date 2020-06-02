@@ -2,6 +2,7 @@ package monsters
 
 import (
 	"fmt"
+	"github.com/joram/game-server/db"
 	"github.com/joram/game-server/utils"
 	"math/rand"
 	"os"
@@ -34,7 +35,7 @@ func listImages(path, ext string) []string {
 	return paths
 }
 
-func NewPlayer(x, y int) Player {
+func NewPlayer(id,x,y int) Player {
 	images := []string{
 		baseImages[rand.Intn(len(baseImages))],
 		legsImages[rand.Intn(len(legsImages))],
@@ -43,10 +44,16 @@ func NewPlayer(x, y int) Player {
 		headImages[rand.Intn(len(headImages))],
 	}
 
+	// always a negative number so it doesn't collide with monsters
+	if id > 0 {
+		id = -id
+	}
+
+	//dbPlayer := db.
 	p := Player{
 		&BaseMonster{
 			Object: &utils.Object{
-				ID:    utils.NextID(),
+				ID:    id,
 				X:     x,
 				Y:     y,
 				Type:  "player",
@@ -70,6 +77,7 @@ func (p Player) GetLocation() (x,y int){
 func (p Player) UpdateLocation(x,y int){
 	p.X = x
 	p.Y = y
+	db.UpdatePlayer(p.ID, p.X, p.Y)
 	//fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
 	utils.BroadcastLocationChange(p, utils.ObjectClients)
 }
@@ -78,6 +86,7 @@ func (p Player) UpdateDeltaLocation(x,y int){
 	p.X += x
 	p.Y += y
 	//fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
+	db.UpdatePlayer(p.ID, p.X, p.Y)
 	utils.BroadcastLocationChange(p, utils.ObjectClients)
 }
 
@@ -85,10 +94,20 @@ func (p Player) GetID() int {
 	return p.BaseMonster.GetID()
 }
 
-func (p Player) AsString() string {
-	fmt.Println("rendering player as string")
-	return p.BaseMonster.AsString()
-}
+//func (p Player) GetType() string {
+//	return p.BaseMonster.GetType()
+//}
+//
+//func (p Player) IsDead() bool {
+//	return p.BaseMonster.IsDead()
+//}
+//func (p Player) TakeDamage(damage int, attacker utils.BaseMonsterInterface) {
+//	p.BaseMonster.TakeDamage(damage, attacker)
+//}
+//
+//func (p Player) AsString() string {
+//	return p.BaseMonster.AsString()
+//}
 
 func (p *Player) register(){
 	PLAYERS = append(PLAYERS, p)

@@ -3,15 +3,9 @@ package monsters
 import (
 	"encoding/json"
 	"fmt"
-	"math"
-
-	//"github.com/joram/game-server/game"
 	"github.com/joram/game-server/utils"
-
-	//"github.com/joram/game-server/game"
-
-	//"github.com/joram/game-server/monsters"
 	"log"
+	"math"
 )
 
 type BaseMonster struct {
@@ -74,7 +68,6 @@ func (m *BaseMonster) AsString() string {
 	}
 	jsonString, err := json.Marshal(m)
 
-	fmt.Println(m.Images)
 	m.Images = originalImages
 	if err != nil {
 		log.Println("write:", err)

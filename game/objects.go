@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"github.com/joram/game-server/db"
 	"github.com/joram/game-server/monsters"
 	"github.com/joram/game-server/utils"
 	"log"
@@ -16,8 +17,23 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	player := monsters.NewPlayer(0,0)
-	client := utils.ObjectClient{C:c, Player:player, Mux:&sync.Mutex{}}
+	client := utils.ObjectClient{C:c, Player:monsters.Player{}, Mux:&sync.Mutex{}}
+
+	// login
+	msg, err := client.ReadMessage()
+	if err != nil {
+		fmt.Println(err)
+	}
+	accessToken, _ := msg["accessToken"]
+	googleId, _ := msg["googleId"]
+	email, _ := msg["email"]
+	firstName, _ := msg["firstName"]
+	lastName, _ := msg["lastName"]
+	client.GoogleId = googleId.(string)
+	client.AccessToken = accessToken.(string)
+	dbPlayer := db.GetOrCreatePlayer(email.(string), firstName.(string), lastName.(string))
+	client.Player = monsters.NewPlayer(dbPlayer.Id, dbPlayer.X, dbPlayer.Y)
+
 	utils.ObjectClients = append(utils.ObjectClients, client)
 
 	go func(client utils.ObjectClient){
