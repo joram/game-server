@@ -102,20 +102,31 @@ func (m *BaseMonster) GetBackpackItems() []*items.Item {
 }
 
 func (m *BaseMonster) EquipItem(id int) *items.Item {
-	if ITEMS[id].OwnerID != m.ID {
-		return ITEMS[id]
-	}
+	fmt.Println("equipping",id)
+	ITEMS[id].OwnerID = m.ID
+	ITEMS[id].IsCarried = true
 	ITEMS[id].IsEquipped = true
 	ITEMS[id].EquippedSlot = ITEMS[id].AllowedSlot
 	return ITEMS[id]
 }
 
 func (m *BaseMonster) UnequipItem(id int) *items.Item {
-	if ITEMS[id].OwnerID != m.ID {
-		return ITEMS[id]
-	}
+	fmt.Println("unequipping",id)
+	ITEMS[id].OwnerID = m.ID
+	ITEMS[id].IsCarried = true
 	ITEMS[id].IsEquipped = false
 	ITEMS[id].EquippedSlot = -1
+	return ITEMS[id]
+}
+
+func (m *BaseMonster) DropItem(id int) *items.Item {
+	fmt.Println("dropping",id)
+	ITEMS[id].IsEquipped = false
+	ITEMS[id].IsCarried = false
+	ITEMS[id].OwnerID = -1
+	ITEMS[id].EquippedSlot = -1
+	ITEMS[id].X = m.X
+	ITEMS[id].Y = m.Y
 	return ITEMS[id]
 }
 

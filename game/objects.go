@@ -109,6 +109,11 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 			} else if id, ok := msg["unequip_item"]; ok {
 				item :=  client.Player.UnequipItem(int(id.(float64)))
 				client.SendBackpackItem(item)
+
+			// drop item
+			} else if id, ok := msg["drop_item"]; ok {
+				item :=  client.Player.DropItem(int(id.(float64)))
+				client.SendBackpackItem(item)
 			}
 	}
 

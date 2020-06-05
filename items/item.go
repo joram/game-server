@@ -9,8 +9,8 @@ type ItemType struct {
 
 var SWORD = ItemType{
 	"sword",
-	"http://localhost:2305/images/player/hand1/short_sword.png",
-	"http://localhost:2305/images/item/weapon/long_sword1.png",
+	"/images/player/hand1/short_sword.png",
+	"/images/item/weapon/long_sword1.png",
 	3,
 }
 
