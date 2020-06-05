@@ -16,5 +16,6 @@ type BaseMonsterInterface interface {
 
 	GetBackpackItems() []*items.Item
 	EquipItem(id int) *items.Item
+	UnequipItem(id int) *items.Item
 }
 

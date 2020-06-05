@@ -115,6 +115,7 @@ func (m *BaseMonster) UnequipItem(id int) *items.Item {
 		return ITEMS[id]
 	}
 	ITEMS[id].IsEquipped = false
+	ITEMS[id].EquippedSlot = -1
 	return ITEMS[id]
 }
 

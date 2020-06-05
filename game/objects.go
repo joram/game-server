@@ -104,8 +104,12 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 			} else if id, ok := msg["equip_item"]; ok {
 				item :=  client.Player.EquipItem(int(id.(float64)))
 				client.SendBackpackItem(item)
-			}
 
+			// unequip item
+			} else if id, ok := msg["unequip_item"]; ok {
+				item :=  client.Player.UnequipItem(int(id.(float64)))
+				client.SendBackpackItem(item)
+			}
 	}
 
 		newOjectClients := []utils.ObjectClient{}
