@@ -1,2 +1,4 @@
 scripts/.env
 .idea*
+db/game.db
+

@@ -22,7 +22,7 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 	// login
 	msg, err := client.ReadMessage()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 	accessToken, _ := msg["accessToken"]
 	googleId, _ := msg["googleId"]
@@ -61,6 +61,7 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 				client.GoogleId = googleId.(string)
 				client.AccessToken = accessToken.(string)
 
+			// move
 			} else if direction, ok := msg["direction"]; ok {
 				x,y := client.Player.GetLocation()
 				if direction == "left" { x -= 1}
@@ -79,21 +80,33 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 
-			// position update
-			} else {
-				x := int(msg["x"].(float64))
-				y := int(msg["y"].(float64))
-				if !client.Player.IsDead() {
-					m := monsterAt(x, y)
-					if m != nil && !m.IsDead(){
-						fmt.Printf("player[%d] attacks %s[%d]\n", client.Player.GetID(), m.GetType(), m.GetID())
-						m.TakeDamage(5, client.Player)
-					} else {
-						client.Player.UpdateLocation(x, y)
-					}
+			//// position update
+			//} else if _, ok := msg["x"]; ok {
+			//	x := int(msg["x"].(float64))
+			//	y := int(msg["y"].(float64))
+			//	if !client.Player.IsDead() {
+			//		m := monsterAt(x, y)
+			//		if m != nil && !m.IsDead(){
+			//			fmt.Printf("player[%d] attacks %s[%d]\n", client.Player.GetID(), m.GetType(), m.GetID())
+			//			m.TakeDamage(5, client.Player)
+			//		} else {
+			//			client.Player.UpdateLocation(x, y)
+			//		}
+			//	}
+
+			// list items in backpack
+			} else if _, ok := msg["backpack"]; ok {
+				for _, item := range client.Player.GetBackpackItems() {
+					client.SendBackpackItem(item)
 				}
+
+			// equip item
+			} else if id, ok := msg["equip_item"]; ok {
+				item :=  client.Player.EquipItem(int(id.(float64)))
+				client.SendBackpackItem(item)
 			}
-		}
+
+	}
 
 		newOjectClients := []utils.ObjectClient{}
 		for _, otherCLient := range utils.ObjectClients {

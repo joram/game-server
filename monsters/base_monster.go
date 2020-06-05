@@ -3,6 +3,7 @@ package monsters
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/joram/game-server/items"
 	"github.com/joram/game-server/utils"
 	"log"
 	"math"
@@ -83,6 +84,38 @@ func (m *BaseMonster) TakeDamage(damage int, attacker utils.BaseMonsterInterface
 	if m.IsDead() {
 		fmt.Printf("%s[%d] died\n", m.Type, m.ID)
 	}
+}
+
+var s = items.SWORD.NewInstance(0,0,0,false,true, -32, -1)
+var ITEMS = map[int]*items.Item{
+	0: &s,
+}
+
+func (m *BaseMonster) GetBackpackItems() []*items.Item {
+	var myItems []*items.Item
+	for _, item := range ITEMS {
+		if item.OwnerID == m.ID {
+			myItems = append(myItems, item)
+		}
+	}
+	return myItems
+}
+
+func (m *BaseMonster) EquipItem(id int) *items.Item {
+	if ITEMS[id].OwnerID != m.ID {
+		return ITEMS[id]
+	}
+	ITEMS[id].IsEquipped = true
+	ITEMS[id].EquippedSlot = ITEMS[id].AllowedSlot
+	return ITEMS[id]
+}
+
+func (m *BaseMonster) UnequipItem(id int) *items.Item {
+	if ITEMS[id].OwnerID != m.ID {
+		return ITEMS[id]
+	}
+	ITEMS[id].IsEquipped = false
+	return ITEMS[id]
 }
 
 func (m *BaseMonster) GetType() string {

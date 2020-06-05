@@ -62,6 +62,14 @@ func (cw *ObjectClient) UpdateObject(object ObjectInterface) {
 	cw.C.WriteMessage(1, []byte(jsonString))
 }
 
+func (cw *ObjectClient) SendBackpackItem(item interface{}) {
+	jsonString, err := json.Marshal(item)
+	if err != nil {
+		log.Println("write:", err)
+	}
+	cw.C.WriteMessage(1, []byte(jsonString))
+}
+
 
 func BroadcastLocationChange(object ObjectInterface, objectClients []ObjectClient){
 	for _, client := range objectClients {

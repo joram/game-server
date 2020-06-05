@@ -94,6 +94,11 @@ func (p Player) GetID() int {
 	return p.BaseMonster.GetID()
 }
 
+//func (p Player) GetBackpackItems() []items.Item {
+//	return items.SWORD
+//	return it
+//}
+
 //func (p Player) GetType() string {
 //	return p.BaseMonster.GetType()
 //}
