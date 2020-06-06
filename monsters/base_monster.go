@@ -83,6 +83,14 @@ func (m *BaseMonster) TakeDamage(damage int, attacker utils.BaseMonsterInterface
 	fmt.Printf("%s[%d] took %d damage from %s[%d]\n", m.Type, m.ID, damage, attacker.GetType(), attacker.GetID())
 	if m.IsDead() {
 		fmt.Printf("%s[%d] died\n", m.Type, m.ID)
+		// todo drop items
+		for _, item := range m.GetBackpackItems() {
+			item.OwnerID = -1
+			item.IsCarried = false
+			item.IsEquipped = false
+			item.X = m.X
+			item.Y = m.Y
+		}
 	}
 }
 

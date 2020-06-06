@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	//"github.com/joram/game-server/game"
@@ -49,7 +50,8 @@ func LoadObjectTypes() []ObjectType {
 func (o *Object) UpdateLocation(x,y int){
 	o.X = x
 	o.Y = y
-	//fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
+	fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
+
 	BroadcastLocationChange(o, ObjectClients)
 }
 
