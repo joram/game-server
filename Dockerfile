@@ -17,5 +17,4 @@ WORKDIR /
 ENTRYPOINT ["/bin/game-server"]
 RUN mkdir /static
 COPY ./static/ /static/
-RUN ls -hal /static/
 COPY --from=builder /go/src/github.com/joram/game-server/build/ /bin/

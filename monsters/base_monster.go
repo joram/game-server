@@ -83,20 +83,13 @@ func (m *BaseMonster) TakeDamage(damage int, attacker utils.BaseMonsterInterface
 	fmt.Printf("%s[%d] took %d damage from %s[%d]\n", m.Type, m.ID, damage, attacker.GetType(), attacker.GetID())
 	if m.IsDead() {
 		fmt.Printf("%s[%d] died\n", m.Type, m.ID)
-		// todo drop items
-		for _, item := range m.GetBackpackItems() {
-			item.OwnerID = -1
-			item.IsCarried = false
-			item.IsEquipped = false
-			item.X = m.X
-			item.Y = m.Y
-		}
+		m.DropAllItems()
 	}
 }
 
-var s = items.SWORD.NewInstance(0,0,0,false,true, -32, -1)
+var s = items.SWORD.NewInstance(0,0,false,true, -32, -1)
 var ITEMS = map[int]*items.Item{
-	0: &s,
+	s.ID: &s,
 }
 
 func (m *BaseMonster) GetBackpackItems() []*items.Item {
@@ -104,6 +97,7 @@ func (m *BaseMonster) GetBackpackItems() []*items.Item {
 	for _, item := range ITEMS {
 		if item.OwnerID == m.ID {
 			myItems = append(myItems, item)
+			fmt.Printf("%s[%d] has %s[%d]\n", m.Type, m.ID, item.Name, item.ID)
 		}
 	}
 	return myItems
@@ -127,6 +121,21 @@ func (m *BaseMonster) UnequipItem(id int) *items.Item {
 	return ITEMS[id]
 }
 
+func (m *BaseMonster) DropAllItems() {
+	for _, item := range m.GetBackpackItems() {
+		ITEMS[item.ID].OwnerID = -1
+		ITEMS[item.ID].IsCarried = false
+		ITEMS[item.ID].IsEquipped = false
+		ITEMS[item.ID].X = m.X
+		ITEMS[item.ID].Y = m.Y
+		for _, c := range utils.ObjectClients {
+			c.SendBackpackItem(ITEMS[item.ID])
+		}
+		fmt.Printf("%s[%d] dropped %s[%d]\n", m.Type, m.ID, ITEMS[item.ID].Name, item.ID)
+	}
+
+}
+
 func (m *BaseMonster) DropItem(id int) *items.Item {
 	fmt.Println("dropping",id)
 	ITEMS[id].IsEquipped = false
@@ -138,13 +147,29 @@ func (m *BaseMonster) DropItem(id int) *items.Item {
 	return ITEMS[id]
 }
 
+func (m *BaseMonster) PickUpItem(item *items.Item)  {
+	item.IsEquipped = false
+	item.IsCarried = true
+	item.OwnerID = m.ID
+	item.EquippedSlot = -1
+	item.X = m.X
+	item.Y = m.Y
+	ITEMS[item.ID] = item
+	for _, c := range utils.ObjectClients {
+		if c.Player.GetID() == m.ID {
+			c.SendBackpackItem(item)
+			break
+		}
+	}
+}
+
 func (m *BaseMonster) GetType() string {
 	return m.Type
 }
 
 func (m *BaseMonster) Broadcast(){
 	for _, client := range utils.ObjectClients {
-		client.UpdateObject(m)
+		client.UpdateMonster(m)
 	}
 }
 
@@ -168,7 +193,6 @@ func (m *BaseMonster) nearestPlayer() (*Player, float64) {
 	}
 	return nearest, nearestDistance
 }
-
 
 func (m *BaseMonster) isSolid(x,y int) bool {
 	return utils.GetPixel(x,y).G > 180

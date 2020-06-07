@@ -1,5 +1,9 @@
 package items
 
+import (
+	"github.com/joram/game-server/ids"
+)
+
 type ItemType struct {
 	Name string `json:"name"`
 	EquippedImage string `json:"equipped_image"`
@@ -14,10 +18,10 @@ var SWORD = ItemType{
 	3,
 }
 
-func (it *ItemType) NewInstance(x,y, id int, isEquipped, isCarried bool, ownerID, equippedSlot int) Item {
+func (it *ItemType) NewInstance(x,y int, isEquipped, isCarried bool, ownerID, equippedSlot int) Item {
 	return Item{
 		ItemType:     it,
-		ID:			  id,
+		ID:           ids.NextID("item"),
 		X:            x,
 		Y:            y,
 		IsEquipped:   isEquipped,

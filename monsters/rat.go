@@ -2,6 +2,7 @@ package monsters
 
 import (
 	"fmt"
+	"github.com/joram/game-server/ids"
 	"github.com/joram/game-server/utils"
 	"math/rand"
 	"time"
@@ -16,11 +17,11 @@ func NewRat(x, y int) Rat {
 	k := Rat{
 		&BaseMonster{
 			Object: &utils.Object{
-				ID:    utils.NextID(),
-				X:     x,
-				Y:     y,
-				Type:  "Rat",
-				Solid: true,
+				ID:     ids.NextID("monster"),
+				X:      x,
+				Y:      y,
+				Type:   "Rat",
+				Solid:  true,
 				Images: []string{"/images/dc-mon/animals/rat.png"},
 			},
 			MaxHealth: 5,

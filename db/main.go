@@ -2,7 +2,7 @@ package db
 
 import (
 	"database/sql"
-	"github.com/joram/game-server/utils"
+	"github.com/joram/game-server/ids"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -55,7 +55,7 @@ func GetOrCreatePlayer(email,firstName,lastName string) Player {
 		return *player
 	}
 
-	p := CreatePlayer(-utils.NextID(),0,0,firstName,lastName,email)
+	p := CreatePlayer(-ids.NextID("monster"),0,0,firstName,lastName,email)
 	return p
 }
 

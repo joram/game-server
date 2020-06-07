@@ -3,6 +3,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
+	"github.com/joram/game-server/items"
 	"log"
 	"sync"
 )
@@ -49,16 +50,26 @@ func (cw *ObjectClient) SendPlayerID() {
 	defer cw.Mux.Unlock()
 
 	jsonString := fmt.Sprintf("{\"playerId\": %d}", cw.Player.GetID())
-	fmt.Println(jsonString)
 	cw.C.WriteMessage(1, []byte(jsonString))
 
 }
 
-func (cw *ObjectClient) UpdateObject(object ObjectInterface) {
+func (cw *ObjectClient) UpdateMonster(object ObjectInterface) {
 	cw.Mux.Lock()
 	defer cw.Mux.Unlock()
 
 	jsonString := object.AsString()
+	cw.C.WriteMessage(1, []byte(jsonString))
+}
+
+func (cw *ObjectClient) UpdateItem(object *items.Item) {
+	cw.Mux.Lock()
+	defer cw.Mux.Unlock()
+
+	jsonString, err := json.Marshal(object)
+	if err != nil {
+		log.Println("write:", err)
+	}
 	cw.C.WriteMessage(1, []byte(jsonString))
 }
 
@@ -73,6 +84,6 @@ func (cw *ObjectClient) SendBackpackItem(item interface{}) {
 
 func BroadcastLocationChange(object ObjectInterface, objectClients []ObjectClient){
 	for _, client := range objectClients {
-		client.UpdateObject(object)
+		client.UpdateMonster(object)
 	}
 }

@@ -50,7 +50,7 @@ func LoadObjectTypes() []ObjectType {
 func (o *Object) UpdateLocation(x,y int){
 	o.X = x
 	o.Y = y
-	fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
+	fmt.Printf("moving %s[%d] to (%d, %d)\n", o.Type, o.ID, o.X, o.Y)
 
 	BroadcastLocationChange(o, ObjectClients)
 }
@@ -73,7 +73,7 @@ func (o *Object) GetID() int {
 
 func (o *Object) Broadcast(){
 	for _, client := range ObjectClients {
-		client.UpdateObject(o)
+		client.UpdateMonster(o)
 	}
 }
 

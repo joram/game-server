@@ -10,6 +10,20 @@ import (
 	"sync"
 )
 
+
+func fullStateUpdate(client utils.ObjectClient){
+	client.SendPlayerID()
+	for _, otherClient := range utils.ObjectClients {
+		client.UpdateMonster(otherClient.Player)
+	}
+	for _, monster := range allMonsters() {
+		client.UpdateMonster(monster)
+	}
+	for _, item := range monsters.ITEMS {
+		client.UpdateItem(item)
+	}
+}
+
 func ServeObjects(w http.ResponseWriter, r *http.Request) {
 	c, err := utils.Upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -36,17 +50,11 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 
 	utils.ObjectClients = append(utils.ObjectClients, client)
 
+
 	go func(client utils.ObjectClient){
 		defer client.C.Close()
 
-		client.SendPlayerID()
-		for _, otherClient := range utils.ObjectClients {
-			client.UpdateObject(otherClient.Player)
-		}
-		for _, o := range allMonsters() {
-			client.UpdateObject(o)
-		}
-
+		fullStateUpdate(client)
 		for {
 			msg, err := client.ReadMessage()
 			if err != nil {
@@ -80,19 +88,10 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 
-			//// position update
-			//} else if _, ok := msg["x"]; ok {
-			//	x := int(msg["x"].(float64))
-			//	y := int(msg["y"].(float64))
-			//	if !client.Player.IsDead() {
-			//		m := monsterAt(x, y)
-			//		if m != nil && !m.IsDead(){
-			//			fmt.Printf("player[%d] attacks %s[%d]\n", client.Player.GetID(), m.GetType(), m.GetID())
-			//			m.TakeDamage(5, client.Player)
-			//		} else {
-			//			client.Player.UpdateLocation(x, y)
-			//		}
-			//	}
+
+			// list everything
+			} else if _, ok := msg["full_state"]; ok {
+				fullStateUpdate(client)
 
 			// list items in backpack
 			} else if _, ok := msg["backpack"]; ok {

@@ -2,6 +2,8 @@ package monsters
 
 import (
 	"fmt"
+	"github.com/joram/game-server/ids"
+	"github.com/joram/game-server/items"
 	"github.com/joram/game-server/utils"
 	"math/rand"
 	"time"
@@ -16,11 +18,11 @@ func NewKobold(x, y int) Kobold {
 	k := Kobold{
 		&BaseMonster{
 			Object: &utils.Object{
-				ID:    utils.NextID(),
-				X:     x,
-				Y:     y,
-				Type:  "kobold",
-				Solid: true,
+				ID:     ids.NextID("monster"),
+				X:      x,
+				Y:      y,
+				Type:   "kobold",
+				Solid:  true,
 				Images: []string{"/images/dc-mon/kobold.png"},
 			},
 			MaxHealth: 20,
@@ -30,6 +32,8 @@ func NewKobold(x, y int) Kobold {
 			IsAttacking: false,
 		},
 	}
+	sword := items.SWORD.NewInstance(0,0,false,true, k.ID, -1)
+	k.PickUpItem(&sword)
 	go k.move()
 	return k
 }
