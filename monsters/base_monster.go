@@ -18,11 +18,11 @@ type BaseMonster struct {
 	IsAttacking bool
 }
 
-func (m *BaseMonster) IsDead() bool {
+func (m BaseMonster) IsDead() bool {
 	return m.Health <= 0
 }
 
-func (m *BaseMonster) HealthBar() *string {
+func (m BaseMonster) HealthBar() *string {
 	if m.Health == m.MaxHealth || m.IsDead() {
 		return nil
 	}
@@ -58,23 +58,32 @@ func (m *BaseMonster) HealthBar() *string {
 	return &s[5]
 }
 
-func (m *BaseMonster) AsString() string {
+func (m BaseMonster) AsString() string {
 	originalImages := m.Images
-	hb := m.HealthBar()
-	if m.IsDead(){
-		m.Images = []string{"/images/dc-misc/blood_red.png"}
-	}
-	if hb != nil {
-		m.Images = append(m.Images, *hb)
-	}
+	m.Images = m.GetImages()
 	jsonString, err := json.Marshal(m)
-
 	m.Images = originalImages
+
 	if err != nil {
 		log.Println("write:", err)
 	}
 	return string(jsonString)
 }
+
+func (m BaseMonster) GetImages() []string {
+
+	if m.IsDead(){
+		return []string{"/images/dc-misc/blood_red.png"}
+	}
+
+	hb := m.HealthBar()
+	images := m.Images
+	if hb != nil {
+		images = append(images, *hb)
+	}
+	return images
+}
+
 
 func (m *BaseMonster) TakeDamage(damage int, attacker utils.BaseMonsterInterface) {
 	m.Health -= damage
@@ -92,7 +101,7 @@ var ITEMS = map[int]*items.Item{
 	s.ID: &s,
 }
 
-func (m *BaseMonster) GetBackpackItems() []*items.Item {
+func (m BaseMonster) GetBackpackItems() []*items.Item {
 	var myItems []*items.Item
 	for _, item := range ITEMS {
 		if item.OwnerID == m.ID {
@@ -103,7 +112,7 @@ func (m *BaseMonster) GetBackpackItems() []*items.Item {
 	return myItems
 }
 
-func (m *BaseMonster) EquipItem(id int) *items.Item {
+func (m BaseMonster) EquipItem(id int) *items.Item {
 	fmt.Println("equipping",id)
 	ITEMS[id].OwnerID = m.ID
 	ITEMS[id].IsCarried = true
@@ -112,7 +121,7 @@ func (m *BaseMonster) EquipItem(id int) *items.Item {
 	return ITEMS[id]
 }
 
-func (m *BaseMonster) UnequipItem(id int) *items.Item {
+func (m BaseMonster) UnequipItem(id int) *items.Item {
 	fmt.Println("unequipping",id)
 	ITEMS[id].OwnerID = m.ID
 	ITEMS[id].IsCarried = true
@@ -121,7 +130,7 @@ func (m *BaseMonster) UnequipItem(id int) *items.Item {
 	return ITEMS[id]
 }
 
-func (m *BaseMonster) DropAllItems() {
+func (m BaseMonster) DropAllItems() {
 	for _, item := range m.GetBackpackItems() {
 		ITEMS[item.ID].OwnerID = -1
 		ITEMS[item.ID].IsCarried = false
@@ -136,7 +145,7 @@ func (m *BaseMonster) DropAllItems() {
 
 }
 
-func (m *BaseMonster) DropItem(id int) *items.Item {
+func (m BaseMonster) DropItem(id int) *items.Item {
 	fmt.Println("dropping",id)
 	ITEMS[id].IsEquipped = false
 	ITEMS[id].IsCarried = false
@@ -147,7 +156,7 @@ func (m *BaseMonster) DropItem(id int) *items.Item {
 	return ITEMS[id]
 }
 
-func (m *BaseMonster) PickUpItem(item *items.Item)  {
+func (m BaseMonster) PickUpItem(item *items.Item)  {
 	item.IsEquipped = false
 	item.IsCarried = true
 	item.OwnerID = m.ID
@@ -163,7 +172,7 @@ func (m *BaseMonster) PickUpItem(item *items.Item)  {
 	}
 }
 
-func (m *BaseMonster) GetType() string {
+func (m BaseMonster) GetType() string {
 	return m.Type
 }
 

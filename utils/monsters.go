@@ -6,6 +6,7 @@ type BaseMonsterInterface interface {
 	AsString() string
 	GetID() int
 	GetType() string
+	GetImages() []string
 
 	GetLocation() (x,y int)
 	UpdateLocation(x,y int)

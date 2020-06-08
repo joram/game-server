@@ -3,10 +3,8 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"log"
-
-	//"github.com/joram/game-server/game"
 	"io/ioutil"
+	"log"
 )
 
 type Object struct {
@@ -19,6 +17,9 @@ type Object struct {
 }
 
 func (o *Object) AsString() string {
+	if o.Type == "player" {
+		panic("damnit")
+	}
 	jsonString, err := json.Marshal(o)
 	if err != nil {
 		log.Println("write:", err)
@@ -73,7 +74,7 @@ func (o *Object) GetID() int {
 
 func (o *Object) Broadcast(){
 	for _, client := range ObjectClients {
-		client.UpdateMonster(o)
+		client.UpdateObject(o)
 	}
 }
 

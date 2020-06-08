@@ -31,7 +31,7 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := utils.ObjectClient{C:c, Player:monsters.Player{}, Mux:&sync.Mutex{}}
+	client := utils.ObjectClient{C: c, Player:monsters.Player{}, Mux:&sync.Mutex{}}
 
 	// login
 	msg, err := client.ReadMessage()
@@ -97,6 +97,13 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 			} else if _, ok := msg["backpack"]; ok {
 				for _, item := range client.Player.GetBackpackItems() {
 					client.SendBackpackItem(item)
+				}
+				for _, item := range monsters.ITEMS {
+					x,y := client.Player.GetLocation()
+					if item.X == x && item.Y == y {
+						client.SendBackpackItem(item)
+						fmt.Printf("%s[%d] on the ground\n", item.Name, item.ID)
+					}
 				}
 
 			// equip item

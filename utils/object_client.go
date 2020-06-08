@@ -9,10 +9,10 @@ import (
 )
 
 type ObjectClient struct {
-	C      *websocket.Conn
-	Player BaseMonsterInterface
-	Mux    *sync.Mutex
-	GoogleId string
+	C           *websocket.Conn
+	Player      BaseMonsterInterface
+	Mux         *sync.Mutex
+	GoogleId    string
 	AccessToken string
 }
 
@@ -54,10 +54,17 @@ func (cw *ObjectClient) SendPlayerID() {
 
 }
 
-func (cw *ObjectClient) UpdateMonster(object ObjectInterface) {
+func (cw *ObjectClient) UpdateObject(object ObjectInterface) {
 	cw.Mux.Lock()
 	defer cw.Mux.Unlock()
+	jsonString := object.AsString()
+	cw.C.WriteMessage(1, []byte(jsonString))
+}
 
+
+func (cw *ObjectClient) UpdateMonster(object BaseMonsterInterface) {
+	cw.Mux.Lock()
+	defer cw.Mux.Unlock()
 	jsonString := object.AsString()
 	cw.C.WriteMessage(1, []byte(jsonString))
 }
@@ -74,6 +81,9 @@ func (cw *ObjectClient) UpdateItem(object *items.Item) {
 }
 
 func (cw *ObjectClient) SendBackpackItem(item interface{}) {
+	cw.Mux.Lock()
+	defer cw.Mux.Unlock()
+
 	jsonString, err := json.Marshal(item)
 	if err != nil {
 		log.Println("write:", err)
@@ -84,6 +94,6 @@ func (cw *ObjectClient) SendBackpackItem(item interface{}) {
 
 func BroadcastLocationChange(object ObjectInterface, objectClients []ObjectClient){
 	for _, client := range objectClients {
-		client.UpdateMonster(object)
+		client.UpdateObject(object)
 	}
 }
