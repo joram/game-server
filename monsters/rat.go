@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/joram/game-server/ids"
 	"github.com/joram/game-server/utils"
-	"math/rand"
 	"time"
 )
 
@@ -62,8 +61,7 @@ func (r *Rat) move() {
 
 		// attack
 		if r.IsAttacking {
-			damage := rand.Intn(r.MaxDamage - r.MinDamage) + r.MinDamage
-			player.TakeDamage(damage, r)
+			r.Attack(player)
 		}
 
 		// die

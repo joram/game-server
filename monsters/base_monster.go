@@ -7,6 +7,7 @@ import (
 	"github.com/joram/game-server/utils"
 	"log"
 	"math"
+	"math/rand"
 )
 
 type BaseMonster struct {
@@ -85,6 +86,11 @@ func (m BaseMonster) GetImages() []string {
 }
 
 
+func (m *BaseMonster) Attack(target utils.BaseMonsterInterface) {
+	damage := rand.Intn(m.MaxDamage - m.MinDamage) + m.MinDamage
+	target.TakeDamage(damage, m)
+}
+
 func (m *BaseMonster) TakeDamage(damage int, attacker utils.BaseMonsterInterface) {
 	m.Health -= damage
 	m.Solid = false
@@ -96,7 +102,7 @@ func (m *BaseMonster) TakeDamage(damage int, attacker utils.BaseMonsterInterface
 	}
 }
 
-var s = items.SWORD.NewInstance(0,0,false,true, -32, -1)
+var s = items.SWORD1.NewInstance( -32)
 var ITEMS = map[int]*items.Item{
 	s.ID: &s,
 }
@@ -106,7 +112,6 @@ func (m BaseMonster) GetBackpackItems() []*items.Item {
 	for _, item := range ITEMS {
 		if item.OwnerID == m.ID {
 			myItems = append(myItems, item)
-			fmt.Printf("%s[%d] has %s[%d]\n", m.Type, m.ID, item.Name, item.ID)
 		}
 	}
 	return myItems

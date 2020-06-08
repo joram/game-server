@@ -5,7 +5,6 @@ import (
 	"github.com/joram/game-server/ids"
 	"github.com/joram/game-server/items"
 	"github.com/joram/game-server/utils"
-	"math/rand"
 	"time"
 )
 
@@ -32,7 +31,7 @@ func NewKobold(x, y int) Kobold {
 			IsAttacking: false,
 		},
 	}
-	sword := items.SWORD.NewInstance(0,0,false,true, k.ID, -1)
+	sword := items.SWORD2.NewInstance(k.ID)
 	k.PickUpItem(&sword)
 	go k.move()
 	return k
@@ -66,8 +65,7 @@ func (k *Kobold) move() {
 
 		// attack
 		if k.IsAttacking {
-			damage := rand.Intn(k.MaxDamage - k.MinDamage) + k.MinDamage
-			player.TakeDamage(damage, k)
+			k.Attack(player)
 		}
 
 		// die

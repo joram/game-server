@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/joram/game-server/db"
-	"github.com/joram/game-server/items"
 	"github.com/joram/game-server/utils"
 	"log"
 	"math/rand"
@@ -81,16 +80,22 @@ func NewPlayer(id,x,y int) Player {
 	return p
 }
 
-func (p Player) GetLocation() (x,y int){
-	return p.X, p.Y
-}
+func (p Player) Attack(target utils.BaseMonsterInterface) {
+	minDamage := 0
+	maxDamage := 0
+	for _, item := range p.GetBackpackItems() {
+		if item.IsEquipped {
+			minDamage += item.MinDamage
+			maxDamage += item.MaxDamage
+		}
+	}
 
-func (p Player) IsDead() bool {
-	return p.Health <= 0
-}
+	damage := 1
+	if !(minDamage == 0 && maxDamage == 0) {
+		damage = rand.Intn(maxDamage-minDamage) + minDamage
+	}
 
-func (p Player) GetType() string {
-	return p.Type
+	target.TakeDamage(damage, p)
 }
 
 func (p Player) TakeDamage(damage int, attacker utils.BaseMonsterInterface) {
@@ -104,67 +109,23 @@ func (p Player) TakeDamage(damage int, attacker utils.BaseMonsterInterface) {
 	}
 }
 
+
 func (p *Player) Broadcast(){
 	for _, client := range utils.ObjectClients {
 		client.UpdateMonster(p)
 	}
 }
 
-func (p Player) GetBackpackItems() []*items.Item {
-	var myItems []*items.Item
-	for _, item := range ITEMS {
-		if item.OwnerID == p.ID {
-			myItems = append(myItems, item)
-			fmt.Printf("%s[%d] has %s[%d]\n", p.Type, p.ID, item.Name, item.ID)
-		}
+func (p Player) AsString() string {
+	originalImages := p.Images
+	p.Images = p.GetImages()
+	jsonString, err := json.Marshal(p)
+	p.Images = originalImages
+	if err != nil {
+		log.Println("write:", err)
 	}
-	return myItems
+	return string(jsonString)
 }
-
-func (p Player) DropAllItems() {
-	for _, item := range p.GetBackpackItems() {
-		ITEMS[item.ID].OwnerID = -1
-		ITEMS[item.ID].IsCarried = false
-		ITEMS[item.ID].IsEquipped = false
-		ITEMS[item.ID].X = p.X
-		ITEMS[item.ID].Y = p.Y
-		for _, c := range utils.ObjectClients {
-			c.SendBackpackItem(ITEMS[item.ID])
-		}
-		fmt.Printf("%s[%d] dropped %s[%d]\n", p.Type, p.ID, ITEMS[item.ID].Name, item.ID)
-	}
-
-}
-
-func (p Player) DropItem(id int) *items.Item {
-	fmt.Println("dropping",id)
-	ITEMS[id].IsEquipped = false
-	ITEMS[id].IsCarried = false
-	ITEMS[id].OwnerID = -1
-	ITEMS[id].EquippedSlot = -1
-	ITEMS[id].X = p.X
-	ITEMS[id].Y = p.Y
-	return ITEMS[id]
-}
-
-func (p Player) EquipItem(id int) *items.Item {
-	fmt.Println("equipping",id)
-	ITEMS[id].OwnerID = p.ID
-	ITEMS[id].IsCarried = true
-	ITEMS[id].IsEquipped = true
-	ITEMS[id].EquippedSlot = ITEMS[id].AllowedSlot
-	return ITEMS[id]
-}
-
-func (p Player) UnequipItem(id int) *items.Item {
-	fmt.Println("unequipping",id)
-	ITEMS[id].OwnerID = p.ID
-	ITEMS[id].IsCarried = true
-	ITEMS[id].IsEquipped = false
-	ITEMS[id].EquippedSlot = -1
-	return ITEMS[id]
-}
-
 
 func (p Player) GetImages() []string {
 	if p.IsDead(){
@@ -189,34 +150,15 @@ func (p Player) UpdateLocation(x,y int){
 	p.X = x
 	p.Y = y
 	db.UpdatePlayer(p.ID, p.X, p.Y)
-	//fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
 	utils.BroadcastLocationChange(p, utils.ObjectClients)
 }
 
 func (p Player) UpdateDeltaLocation(x,y int){
 	p.X += x
 	p.Y += y
-	//fmt.Printf("moving %d to (%d, %d)\n", o.ID, o.X, o.Y)
 	db.UpdatePlayer(p.ID, p.X, p.Y)
 	utils.BroadcastLocationChange(p, utils.ObjectClients)
 }
-
-func (p Player) GetID() int {
-	return p.ID
-}
-
-func (p Player) AsString() string {
-	originalImages := p.Images
-	p.Images = p.GetImages()
-	jsonString, err := json.Marshal(p)
-	p.Images = originalImages
-	fmt.Println(string(jsonString))
-	if err != nil {
-		log.Println("write:", err)
-	}
-	return string(jsonString)
-}
-
 
 func (p *Player) register(){
 	PLAYERS = append(PLAYERS, p)
@@ -229,5 +171,4 @@ func (p *Player) Unregister(){
 		players = append(players, pp)
 	}
 	PLAYERS = players
-	//p.Broadcast()
 }

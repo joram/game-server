@@ -12,6 +12,7 @@ type BaseMonsterInterface interface {
 	UpdateLocation(x,y int)
 	UpdateDeltaLocation(x,y int)
 
+	Attack(BaseMonsterInterface)
 	TakeDamage(damage int, attacker BaseMonsterInterface)
 	IsDead() bool
 

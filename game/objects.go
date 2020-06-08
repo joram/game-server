@@ -79,8 +79,9 @@ func ServeObjects(w http.ResponseWriter, r *http.Request) {
 				if !client.Player.IsDead() {
 					m := monsterAt(x, y)
 					if m != nil && !m.IsDead(){
-						fmt.Printf("player[%d] attacks %s[%d]\n", client.Player.GetID(), m.GetType(), m.GetID())
-						m.TakeDamage(5, client.Player)
+						client.Player.Attack(m)
+						//fmt.Printf("player[%d] attacks %s[%d]\n", client.Player.GetID(), m.GetType(), m.GetID())
+						//m.TakeDamage(5, client.Player)
 					} else {
 						if !utils.IsSolid(x,y) {
 							client.Player.UpdateLocation(x, y)
