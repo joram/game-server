@@ -85,6 +85,29 @@ func (m BaseMonster) GetImages() []string {
 	return images
 }
 
+func (m *BaseMonster) InitialItems(minItems, maxItems int, options map[int]items.ItemType) []items.Item {
+	total := 0
+	for v, _ := range options {
+		total += v
+	}
+	numItems := rand.Intn(maxItems-minItems+1)+minItems
+
+	var initialItems []items.Item
+	for i :=0; i<numItems; i++ {
+		r := rand.Intn(total)
+		s := 0
+		for v, itemType := range options {
+			s += v
+			if r < s {
+				item := itemType.NewInstance(m.ID)
+				m.PickUpItem(&item)
+				initialItems = append(initialItems, item)
+				break
+			}
+		}
+	}
+	return initialItems
+}
 
 func (m *BaseMonster) Attack(target utils.BaseMonsterInterface) {
 	damage := rand.Intn(m.MaxDamage - m.MinDamage) + m.MinDamage
@@ -102,9 +125,13 @@ func (m *BaseMonster) TakeDamage(damage int, attacker utils.BaseMonsterInterface
 	}
 }
 
-var s = items.SWORD1.NewInstance( -32)
+var s = items.DullSword.NewInstance( -32)
+var a = items.LeatherArmour.NewInstance( -32)
+var h = items.LeatherHelmet.NewInstance( -32)
 var ITEMS = map[int]*items.Item{
 	s.ID: &s,
+	a.ID: &a,
+	h.ID: &h,
 }
 
 func (m BaseMonster) GetBackpackItems() []*items.Item {
@@ -122,7 +149,7 @@ func (m BaseMonster) EquipItem(id int) *items.Item {
 	ITEMS[id].OwnerID = m.ID
 	ITEMS[id].IsCarried = true
 	ITEMS[id].IsEquipped = true
-	ITEMS[id].EquippedSlot = ITEMS[id].AllowedSlot
+	ITEMS[id].EquippedSlot = ITEMS[id].Slot
 	return ITEMS[id]
 }
 
@@ -175,6 +202,7 @@ func (m BaseMonster) PickUpItem(item *items.Item)  {
 			break
 		}
 	}
+	fmt.Printf("%s[%d] picked up %s[%d]\n", m.Type, m.ID, item.Name, item.ID)
 }
 
 func (m BaseMonster) GetType() string {

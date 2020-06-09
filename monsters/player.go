@@ -6,6 +6,7 @@ import (
 	"github.com/joram/game-server/db"
 	"github.com/joram/game-server/utils"
 	"log"
+	"math"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -99,7 +100,19 @@ func (p Player) Attack(target utils.BaseMonsterInterface) {
 }
 
 func (p Player) TakeDamage(damage int, attacker utils.BaseMonsterInterface) {
-	p.Health -= damage
+	ac := 0
+	for _, item := range p.GetBackpackItems() {
+		if item.IsEquipped {
+			ac += item.AC
+		}
+	}
+
+	d := float64(damage) - float64(damage)*float64(ac)/10.0
+	dd := int(math.Floor(d))
+	if dd == 0 && d > 0 {
+		dd = 1
+	}
+	p.Health -= dd
 	p.Solid = false
 	p.Broadcast()
 	fmt.Printf("%s[%d] took %d damage from %s[%d]\n", p.Type, p.ID, damage, attacker.GetType(), attacker.GetID())

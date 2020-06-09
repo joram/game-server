@@ -31,8 +31,15 @@ func NewKobold(x, y int) Kobold {
 			IsAttacking: false,
 		},
 	}
-	sword := items.SWORD2.NewInstance(k.ID)
-	k.PickUpItem(&sword)
+
+	options := map[int]items.ItemType{
+		10: items.DullSword,
+		5: items.SharpSword,
+		4: items.LeatherHelmet,
+		1: items.LeatherArmour,
+	}
+	k.InitialItems(1,2, options)
+
 	go k.move()
 	return k
 }
